@@ -161,6 +161,10 @@
  * encoded. */
 #define BASIC_CONSTRAINTS_CA_FALSE {0x30, 0x00}
 
+/* Leaf cert basic_constraints false case2: CA: false (explicit encoding).
+ * Temporary workaround until caliptra-dpe is updated to use proper DER encoding. */
+#define BASIC_CONSTRAINTS_STRING_FALSE_CASE2 {0x30, 0x03, 0x01, 0x01, 0x00}
+
 /* Leaf certificate basic constraints with cA field set to true. */
 #define BASIC_CONSTRAINTS_CA_TRUE {0x30, 0x03, 0x01, 0x01, 0xFF}
 
@@ -1103,6 +1107,7 @@ static bool libspdm_verify_leaf_cert_basic_constraints(const uint8_t *cert, size
     size_t len;
 
     uint8_t basic_constraints_false_case[] = BASIC_CONSTRAINTS_CA_FALSE;
+    uint8_t basic_constraints_false_case2[] = BASIC_CONSTRAINTS_STRING_FALSE_CASE2;
 
     len = LIBSPDM_MAX_BASIC_CONSTRAINTS_CA_LEN;
 
@@ -1123,6 +1128,13 @@ static bool libspdm_verify_leaf_cert_basic_constraints(const uint8_t *cert, size
         (libspdm_consttime_is_mem_equal(cert_basic_constraints,
                                         basic_constraints_false_case,
                                         sizeof(basic_constraints_false_case)))) {
+        return true;
+    }
+
+    if ((len == sizeof(basic_constraints_false_case2)) &&
+        (libspdm_consttime_is_mem_equal(cert_basic_constraints,
+                                        basic_constraints_false_case2,
+                                        sizeof(basic_constraints_false_case2)))) {
         return true;
     }
 
